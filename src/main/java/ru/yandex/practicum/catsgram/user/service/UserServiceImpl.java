@@ -5,10 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.catsgram.Constants;
+import ru.yandex.practicum.catsgram.exceptions.NotFoundException;
 import ru.yandex.practicum.catsgram.user.User;
 import ru.yandex.practicum.catsgram.user.UserMapper;
 import ru.yandex.practicum.catsgram.user.UserRepository;
 import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
+import ru.yandex.practicum.catsgram.user.dto.UpdateUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UserDto;
 
 import java.util.ArrayList;
@@ -32,16 +35,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto patchUser(Long userId, NewUserDto newUserDto) {
-        User user = userRepository.findUserById(userId);
-        if (newUserDto.getName() != null) {
-            user.setName(newUserDto.getName());
+    public UserDto patchUser(Long userId, UpdateUserDto updateUserDto) {
+        log.info("Обновление пользователя с id {} ", userId);
+        User user = checkUserExist(userId);
+        if (updateUserDto.getName() != null
+                && !updateUserDto.getName().equals(user.getName())
+                && !updateUserDto.getName().isEmpty()) {
+            user.setName(updateUserDto.getName());
+        } else {
+            throw new IllegalArgumentException("New name is incorrect!");
         }
-        if (newUserDto.getBirthday() != null) {
-            user.setBirthday(newUserDto.getBirthday());
-        }
-        if (newUserDto.getEmail() != null) {
-            user.setEmail(newUserDto.getEmail());
+        if (updateUserDto.getEmail() != null
+                && !updateUserDto.getEmail().equals(user.getEmail())
+                && !updateUserDto.getEmail().isEmpty()) {
+            user.setEmail(updateUserDto.getEmail());
+        } else {
+            throw new IllegalArgumentException("New email is incorrect!");
         }
         log.info("Данные пользователя с id {} обновлены на {}", userId, user);
         return userMapper.toUserDto(userRepository.save(user));
@@ -51,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUserById(Long userId) {
         log.info("Вывод пользователя с id {}", userId);
-        return userMapper.toUserDto(userRepository.findUserById(userId));
+        return userMapper.toUserDto(checkUserExist(userId));
     }
 
     @Override
@@ -74,5 +83,10 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long userId) {
         log.info("Удаление пользователя с id {}", userId);
         userRepository.deleteById(userId);
+    }
+
+    private User checkUserExist(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + Constants.DOES_NOT_EXIST));
     }
 }

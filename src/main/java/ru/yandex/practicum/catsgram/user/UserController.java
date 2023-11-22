@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.Constants;
 import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
+import ru.yandex.practicum.catsgram.user.dto.UpdateUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UserDto;
 import ru.yandex.practicum.catsgram.user.service.UserServiceImpl;
 
@@ -35,6 +36,7 @@ public class UserController {
         return userService.findAllUsers(PageRequest.of(from / size, size));
     }
 
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Valid @RequestBody NewUserDto newUserDto) {
@@ -46,9 +48,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public UserDto patchUserById(
             @PathVariable Long userId,
-            @Valid @RequestBody NewUserDto newUserDto) {
+            @Valid @RequestBody UpdateUserDto updateUserDto) {
         log.info("Получен запрос на обновление данных пользователя c id {}", userId);
-        return userService.patchUser(userId, newUserDto);
+        return userService.patchUser(userId, updateUserDto);
     }
 
     @DeleteMapping("/{userId}")

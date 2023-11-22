@@ -12,5 +12,6 @@ create TABLE IF NOT EXISTS posts
     description VARCHAR(500) NOT NULL,
     photo_url VARCHAR(1000) NOT NULL,
     created_on TIMESTAMP NOT NULL,
+    updated_on TIMESTAMP,
     user_id BIGINT REFERENCES users (id) ON DELETE CASCADE
 );

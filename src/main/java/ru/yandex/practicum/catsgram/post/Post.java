@@ -31,6 +31,9 @@ public class Post {
     @Column(nullable = false)
     LocalDateTime createdOn;
 
+    @Column
+    LocalDateTime updatedOn;
+
     @Column(nullable = false, length = Constants.MAX_LENGTH_POST_DESCRIPTION)
     String description;
 

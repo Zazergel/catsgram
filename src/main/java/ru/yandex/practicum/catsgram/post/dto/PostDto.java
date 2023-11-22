@@ -19,6 +19,8 @@ public class PostDto {
     String author;
     @JsonFormat(pattern = Constants.DT_FORMAT, shape = JsonFormat.Shape.STRING)
     LocalDateTime createdOn;
+    @JsonFormat(pattern = Constants.DT_FORMAT, shape = JsonFormat.Shape.STRING)
+    LocalDateTime updatedOn;
     String description;
     String photoUrl;
 }
