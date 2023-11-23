@@ -29,13 +29,14 @@ public class UserController {
         return userService.getUserById(userId);
     }
 
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getAllUsers(@RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
-                                     @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
-        return userService.findAllUsers(PageRequest.of(from / size, size));
+    public List<UserDto> getAllByIdIn(@RequestParam(required = false) List<Long> ids,
+                                      @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+                                      @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
+        return userService.findAllByIdIn(ids, PageRequest.of(from / size, size));
     }
-
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

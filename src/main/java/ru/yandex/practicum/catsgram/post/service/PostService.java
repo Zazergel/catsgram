@@ -11,7 +11,7 @@ import java.util.List;
 public interface PostService {
     List<PostDto> getAllByUserId(Long userId, Pageable pageable);
 
-    PostDto createPost(NewPostDto newPostDto);
+    PostDto createPost(NewPostDto newPostDto, Long userId);
 
     List<PostDto> getAll();
 

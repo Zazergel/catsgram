@@ -16,8 +16,6 @@ import javax.validation.constraints.Size;
 @ToString
 @Builder
 public class NewPostDto {
-    @NotNull
-    Long authorId;
     @NotBlank
     @Size(max = Constants.MAX_LENGTH_POST_DESCRIPTION)
     String description;

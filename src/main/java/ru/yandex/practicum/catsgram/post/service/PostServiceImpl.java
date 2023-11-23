@@ -38,6 +38,7 @@ public class PostServiceImpl implements PostService {
         return postRepository.findAllByUserId(userId, pageable)
                 .stream()
                 .map(post -> postMapper.toPostDto(post, post.getUser().getName()))
+                .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -47,14 +48,14 @@ public class PostServiceImpl implements PostService {
         return postRepository.findAll()
                 .stream()
                 .map(post -> postMapper.toPostDto(post, post.getUser().getName()))
-                .sorted(Comparator.comparing(PostDto::getCreatedOn))
+                .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public PostDto createPost(NewPostDto newPostDto) {
-        User author = checkUserExist(newPostDto.getAuthorId());
+    public PostDto createPost(NewPostDto newPostDto, Long userId) {
+        User author = checkUserExist(userId);
         return postMapper.toPostDto(
                 postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now())), author.getName());
     }
@@ -63,6 +64,8 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void deleteById(Long postId) {
         log.info("Удаление поста с id {}", postId);
+        postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post with id " + postId + Constants.DOES_NOT_EXIST));
         postRepository.deleteById(postId);
     }
 

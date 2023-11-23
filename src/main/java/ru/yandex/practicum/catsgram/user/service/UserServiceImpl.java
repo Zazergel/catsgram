@@ -14,7 +14,6 @@ import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UpdateUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UserDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,18 +63,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllUsers(Pageable pageable) {
-        log.info("Вывод всех пользователей с пагинацией {}", pageable);
-        return userRepository.findAll(pageable).stream()
+    public List<UserDto> findAllByIdIn(List<Long> ids, Pageable pageable) {
+        log.info("Вывод пользователей по заданному списку id {} с пагинацией {}", ids, pageable);
+        if (ids == null) {
+            return userRepository.findAll()
+                    .stream()
+                    .map(userMapper::toUserDto)
+                    .collect(Collectors.toList());
+        }
+        List<UserDto> listOfUsersByIds = userRepository.findAllByIdIn(ids, pageable)
+                .stream()
                 .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
-
-    }
-
-    @Override
-    public List<User> findAllByIdIn(List<Long> ids, Pageable pageable) {
-        //#TODO
-        return new ArrayList<>();
+        if (listOfUsersByIds.isEmpty()) {
+            return List.of();
+        }
+        return listOfUsersByIds;
     }
 
     @Override

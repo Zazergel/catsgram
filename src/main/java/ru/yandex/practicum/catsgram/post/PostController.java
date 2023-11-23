@@ -43,7 +43,7 @@ public class PostController {
     public PostDto createPost(@PathVariable Long userId,
                               @Valid @RequestBody NewPostDto newPostDto) {
         log.info("Получен запрос на создание нового поста {} от пользователя с id {}", newPostDto, userId);
-        return postService.createPost(newPostDto);
+        return postService.createPost(newPostDto, userId);
     }
 
     @PatchMapping("/{postId}/byUser/{userId}")
