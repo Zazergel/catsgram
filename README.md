@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://github.com/Zazergel/catsgram">
-    <img src="https://raw.githubusercontent.com/Zazergel/catsgram/main/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%B4%D0%BB%D1%8F%20Catsgrajm.png" alt="Logo" width="400" height="200">
+    <img src="https://raw.githubusercontent.com/Zazergel/catsgram/main/logo.png" alt="Logo" width="400" height="200">
   </a>
 
   <h1 align="center">Catsgram</h1>
