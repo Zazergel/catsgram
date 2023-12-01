@@ -1,6 +1,8 @@
 package ru.yandex.practicum.catsgram.user.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Transactional(readOnly = true)
 @Slf4j
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    UserRepository userRepository;
+    UserMapper userMapper;
 
     @Override
     @Transactional
@@ -54,7 +57,6 @@ public class UserServiceImpl implements UserService {
         log.info("Данные пользователя с id {} обновлены на {}", userId, user);
         return userMapper.toUserDto(userRepository.save(user));
     }
-
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -92,4 +94,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + Constants.DOES_NOT_EXIST));
     }
+
+
 }

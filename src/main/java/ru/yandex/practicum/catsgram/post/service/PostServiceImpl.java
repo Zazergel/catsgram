@@ -1,6 +1,8 @@
 package ru.yandex.practicum.catsgram.post.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
 public class PostServiceImpl implements PostService {
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final PostMapper postMapper;
+    PostRepository postRepository;
+    UserRepository userRepository;
+    PostMapper postMapper;
 
     @Override
     public List<PostDto> getAllByUserId(Long userId, Pageable pageable) {
@@ -64,8 +67,6 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public void deleteById(Long postId) {
         log.info("Удаление поста с id {}", postId);
-        postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("Post with id " + postId + Constants.DOES_NOT_EXIST));
         postRepository.deleteById(postId);
     }
 

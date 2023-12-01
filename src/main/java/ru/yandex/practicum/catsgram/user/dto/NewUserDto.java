@@ -15,16 +15,16 @@ import java.time.LocalDate;
 @ToString
 @Builder
 public class NewUserDto {
-    @NotBlank
+    @NotBlank(message = "Имя пользователя не может быть пустым!")
     @Size(min = Constants.MIN_LENGTH_USERNAME, max = Constants.MAX_LENGTH_USERNAME)
     String name;
 
-    @NotNull
-    @PastOrPresent
+    @NotNull(message = "Необходимо указать дату рождения!")
+    @PastOrPresent(message = "Кажется, ваш день рождения еще не наступил :)")
     LocalDate birthday;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Поле email не может быть пустым!")
+    @Email(message = "Некорректный формат email!")
     @Size(min = Constants.MIN_LENGTH_EMAIL, max = Constants.MAX_LENGTH_EMAIL)
     String email;
 }

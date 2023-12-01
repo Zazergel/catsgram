@@ -22,10 +22,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
+
     private final UserServiceImpl userService;
 
     @GetMapping("/{userId}")
     public UserDto getUser(@Positive @PathVariable Long userId) {
+        log.info("Получен запрос на поиск пользователя с id {}", userId);
         return userService.getUserById(userId);
     }
 
@@ -47,9 +49,8 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto patchUserById(
-            @PathVariable Long userId,
-            @Valid @RequestBody UpdateUserDto updateUserDto) {
+    public UserDto patchUserById(@PathVariable Long userId,
+                                 @Valid @RequestBody UpdateUserDto updateUserDto) {
         log.info("Получен запрос на обновление данных пользователя c id {}", userId);
         return userService.patchUser(userId, updateUserDto);
     }
@@ -57,6 +58,8 @@ public class UserController {
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long userId) {
+        log.info("Получен запрос на удаление пользователя c id {}", userId);
         userService.deleteById(userId);
     }
+
 }

@@ -16,10 +16,10 @@ import javax.validation.constraints.Size;
 @ToString
 @Builder
 public class NewPostDto {
-    @NotBlank
+    @NotBlank(message = "Описание не может быть пустым!")
     @Size(max = Constants.MAX_LENGTH_POST_DESCRIPTION)
     String description;
-    @NotNull
+    @NotNull(message = "Нельзя опубликовать пост без фотографии!")
     @Size(max = Constants.MAX_LENGTH_PHOTO_URL)
     String photoUrl;
 }
