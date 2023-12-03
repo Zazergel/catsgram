@@ -16,6 +16,7 @@ import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UpdateUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UserDto;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,11 +72,13 @@ public class UserServiceImpl implements UserService {
             return userRepository.findAll()
                     .stream()
                     .map(userMapper::toUserDto)
+                    .sorted(Comparator.comparing(UserDto::getId))
                     .collect(Collectors.toList());
         }
         List<UserDto> listOfUsersByIds = userRepository.findAllByIdIn(ids, pageable)
                 .stream()
                 .map(userMapper::toUserDto)
+                .sorted(Comparator.comparing(UserDto::getId))
                 .collect(Collectors.toList());
         if (listOfUsersByIds.isEmpty()) {
             return List.of();
