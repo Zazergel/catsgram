@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.catsgram.Constants;
 import ru.yandex.practicum.catsgram.exceptions.ForbiddenException;
 import ru.yandex.practicum.catsgram.exceptions.NotFoundException;
+import ru.yandex.practicum.catsgram.friendship.service.FriendshipService;
 import ru.yandex.practicum.catsgram.post.Post;
 import ru.yandex.practicum.catsgram.post.PostMapper;
 import ru.yandex.practicum.catsgram.post.PostRepository;
@@ -18,6 +19,7 @@ import ru.yandex.practicum.catsgram.post.dto.PostDto;
 import ru.yandex.practicum.catsgram.post.dto.UpdatePostDto;
 import ru.yandex.practicum.catsgram.user.User;
 import ru.yandex.practicum.catsgram.user.UserRepository;
+import ru.yandex.practicum.catsgram.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     UserRepository userRepository;
+    FriendshipService friendshipService;
     PostMapper postMapper;
 
     @Override
@@ -40,7 +43,7 @@ public class PostServiceImpl implements PostService {
         checkUserExist(userId);
         return postRepository.findAllByUserId(userId, pageable)
                 .stream()
-                .map(post -> postMapper.toPostDto(post, post.getUser().getName()))
+                .map(postMapper::toPostDto)
                 .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
     }
@@ -48,11 +51,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDto> getAll() {
         log.info("Вывод всех постов от всех пользователей");
-        return postRepository.findAll()
+        List<PostDto> posts = postRepository.findAll()
                 .stream()
-                .map(post -> postMapper.toPostDto(post, post.getUser().getName()))
+                .map(postMapper::toPostDto)
                 .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
+        if (posts.isEmpty()) {
+            return List.of();
+        }
+        return posts;
     }
 
     @Override
@@ -60,7 +67,7 @@ public class PostServiceImpl implements PostService {
     public PostDto createPost(NewPostDto newPostDto, Long userId) {
         User author = checkUserExist(userId);
         return postMapper.toPostDto(
-                postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now())), author.getName());
+                postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now())));
     }
 
     @Override
@@ -73,7 +80,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public PostDto pathPostByUserById(Long postId, Long userId, UpdatePostDto updatePostDto) {
-        User author = checkUserExist(userId);
+        checkUserExist(userId);
         Post updatedPost = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("Post with id " + postId + Constants.DOES_NOT_EXIST));
         if (!updatedPost.getUser().getId().equals(userId)) {
@@ -84,7 +91,24 @@ public class PostServiceImpl implements PostService {
             updatedPost.setUpdatedOn(LocalDateTime.now());
         }
         return postMapper.toPostDto(
-                postRepository.save(updatedPost), author.getName());
+                postRepository.save(updatedPost));
+    }
+
+    @Override
+    public List<PostDto> getUserFeed(Long userId, Pageable pageable) {
+        List<UserDto> friendsOfUser = friendshipService.findFriendsFromUserById(userId, pageable);
+        if (friendsOfUser.isEmpty()) {
+            return getAllByUserId(userId, pageable);
+        }
+        List<Long> friendsIds = friendsOfUser
+                .stream()
+                .map(UserDto::getId)
+                .collect(Collectors.toList());
+        return postRepository.findAllByUserIdIn(friendsIds, pageable)
+                .stream()
+                .map(postMapper::toPostDto)
+                .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
+                .collect(Collectors.toList());
     }
 
     private User checkUserExist(Long userId) {

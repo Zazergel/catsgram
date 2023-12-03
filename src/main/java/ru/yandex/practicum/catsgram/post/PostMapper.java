@@ -17,6 +17,6 @@ public interface PostMapper {
     Post toPost(NewPostDto newPostDto, User author, LocalDateTime createdOn);
 
 
-    @Mapping(target = "author", source = "user")
-    PostDto toPostDto(Post post, String user);
+    @Mapping(target = "author", source = "post.user.name")
+    PostDto toPostDto(Post post);
 }

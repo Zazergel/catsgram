@@ -93,7 +93,7 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     }
 
-    public List<User> checkTwoFriendsExists(Long userId, Long friendId) {
+    private List<User> checkTwoFriendsExists(Long userId, Long friendId) {
         List<User> foundedUsers = userRepository.findAllByIdIn(List.of(userId, friendId),
                 PageRequest.of(0 / 2, 2));
         if (foundedUsers.size() < 2) {
@@ -102,14 +102,14 @@ public class FriendshipServiceImpl implements FriendshipService {
         return foundedUsers;
     }
 
-    public void friendshipValidation(Long userId, Long friendId) {
+    private void friendshipValidation(Long userId, Long friendId) {
         if (friendshipRepository.findByUserIdAndFriendId(userId, friendId).isPresent()) {
             throw new ForbiddenException("Такая дружба уже существует или запрос от " +
                     "одного из пользователей ожидает подтверждения!");
         }
     }
 
-    public Friendship checkFriendshipConfirmedExist(Long userId, Long friendId) {
+    private Friendship checkFriendshipConfirmedExist(Long userId, Long friendId) {
         if (friendshipRepository.findByUserIdAndFriendIdAndConfirmed(userId, friendId, true).isPresent()) {
             throw new ForbiddenException("Friendship between user id " + userId + " and user id " +
                     friendId + " is already confirmed!");
@@ -119,7 +119,7 @@ public class FriendshipServiceImpl implements FriendshipService {
                 .orElseThrow(() -> new NotFoundException("Запросов на дружбу не найдено!"));
     }
 
-    public void checkSelfFriend(Long userId, Long friendId) {
+    private void checkSelfFriend(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
             throw new ForbiddenException("Нельзя добавить в друзья себя самого!");
         }

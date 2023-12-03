@@ -38,6 +38,15 @@ public class PostController {
         return postService.getAll();
     }
 
+    @GetMapping("/feed/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PostDto> getUserFeed(@Positive @PathVariable Long userId,
+                                     @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+                                     @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
+        log.info("Получен запрос на вывод персональной ленты постов для пользователя с id {}", userId);
+        return postService.getUserFeed(userId, PageRequest.of(from / size, size));
+    }
+
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     public PostDto createPost(@PathVariable Long userId,

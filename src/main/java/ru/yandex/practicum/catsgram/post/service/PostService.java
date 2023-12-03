@@ -1,7 +1,6 @@
 package ru.yandex.practicum.catsgram.post.service;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.catsgram.post.dto.NewPostDto;
 import ru.yandex.practicum.catsgram.post.dto.PostDto;
 import ru.yandex.practicum.catsgram.post.dto.UpdatePostDto;
@@ -17,6 +16,7 @@ public interface PostService {
 
     void deleteById(Long postId);
 
-    @Transactional
     PostDto pathPostByUserById(Long postId, Long userId, UpdatePostDto updatePostDto);
+
+    List<PostDto> getUserFeed(Long userId, Pageable pageable);
 }
