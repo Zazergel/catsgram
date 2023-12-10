@@ -2,15 +2,20 @@ package ru.yandex.practicum.catsgram.post;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.yandex.practicum.catsgram.Constants;
+import ru.yandex.practicum.catsgram.like.Like;
 import ru.yandex.practicum.catsgram.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
+@DynamicUpdate
 @Table(name = "posts", schema = "public")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
@@ -39,4 +44,9 @@ public class Post {
 
     @Column(nullable = false, length = Constants.MAX_LENGTH_PHOTO_URL)
     String photoUrl;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 10)
+    Set<Like> likes;
+
 }

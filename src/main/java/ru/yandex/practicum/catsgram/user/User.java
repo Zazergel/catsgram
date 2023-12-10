@@ -2,12 +2,14 @@ package ru.yandex.practicum.catsgram.user;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
+@DynamicUpdate
 @Table(schema = "public", name = "users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter

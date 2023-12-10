@@ -23,4 +23,5 @@ public class PostDto {
     LocalDateTime updatedOn;
     String description;
     String photoUrl;
+    Long likes;
 }

@@ -11,6 +11,7 @@ import ru.yandex.practicum.catsgram.Constants;
 import ru.yandex.practicum.catsgram.exceptions.ForbiddenException;
 import ru.yandex.practicum.catsgram.exceptions.NotFoundException;
 import ru.yandex.practicum.catsgram.friendship.service.FriendshipService;
+import ru.yandex.practicum.catsgram.like.Like;
 import ru.yandex.practicum.catsgram.post.Post;
 import ru.yandex.practicum.catsgram.post.PostMapper;
 import ru.yandex.practicum.catsgram.post.PostRepository;
@@ -23,7 +24,9 @@ import ru.yandex.practicum.catsgram.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,8 +69,9 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostDto createPost(NewPostDto newPostDto, Long userId) {
         User author = checkUserExist(userId);
+        Set<Like> likes = new HashSet<>();
         return postMapper.toPostDto(
-                postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now())));
+                postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now(), likes)));
     }
 
     @Override
@@ -107,7 +111,8 @@ public class PostServiceImpl implements PostService {
         return postRepository.findAllByUserIdIn(friendsIds, pageable)
                 .stream()
                 .map(postMapper::toPostDto)
-                .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
+                .sorted(Comparator.comparing(PostDto::getLikes)
+                        .reversed().thenComparing(PostDto::getCreatedOn, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 
