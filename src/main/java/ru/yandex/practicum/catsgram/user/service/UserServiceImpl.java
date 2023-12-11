@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,14 +68,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllByIdIn(List<Long> ids, Pageable pageable) {
+    public Page<UserDto> findAllByIdIn(List<Long> ids, Pageable pageable) {
         log.info("Вывод пользователей по заданному списку id {} с пагинацией {}", ids, pageable);
         if (ids == null) {
-            return userRepository.findAll()
+            List<UserDto> users = userRepository.findAll()
                     .stream()
                     .map(userMapper::toUserDto)
                     .sorted(Comparator.comparing(UserDto::getId))
                     .collect(Collectors.toList());
+            return new PageImpl<>(users, pageable, users.size());
         }
         List<UserDto> listOfUsersByIds = userRepository.findAllByIdIn(ids, pageable)
                 .stream()
@@ -81,9 +84,9 @@ public class UserServiceImpl implements UserService {
                 .sorted(Comparator.comparing(UserDto::getId))
                 .collect(Collectors.toList());
         if (listOfUsersByIds.isEmpty()) {
-            return List.of();
+            return Page.empty();
         }
-        return listOfUsersByIds;
+        return new PageImpl<>(listOfUsersByIds, pageable, listOfUsersByIds.size());
     }
 
     @Override

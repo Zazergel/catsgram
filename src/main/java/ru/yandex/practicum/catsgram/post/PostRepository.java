@@ -1,7 +1,6 @@
 package ru.yandex.practicum.catsgram.post;
 
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,11 +12,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @EntityGraph(attributePaths = {"user", "likes"})
     @NotNull
-    List<Post> findAllByUserId(Long userId, Pageable pageable);
+    List<Post> findAllByUserId(Long userId);
 
     @EntityGraph(attributePaths = {"user", "likes"})
     @NotNull
-    List<Post> findAllByUserIdIn(List<Long> ids, Pageable pageable);
+    List<Post> findAllByUserIdIn(List<Long> userIds);
 
     @EntityGraph(attributePaths = {"user", "likes"})
     @NotNull

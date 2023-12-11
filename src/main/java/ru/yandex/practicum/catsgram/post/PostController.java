@@ -2,6 +2,7 @@ package ru.yandex.practicum.catsgram.post;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,6 @@ import ru.yandex.practicum.catsgram.post.service.PostServiceImpl;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class PostController {
 
     @GetMapping("/all/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostDto> getAllByUserId(@Positive @PathVariable Long userId,
+    public Page<PostDto> getAllByUserId(@Positive @PathVariable Long userId,
                                         @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
                                         @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         return postService.getAllByUserId(userId, PageRequest.of(from / size, size));
@@ -33,14 +33,15 @@ public class PostController {
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostDto> getAll() {
+    public Page<PostDto> getAll(@RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
+                                @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         log.info("Получен запрос на вывод списка всех постов");
-        return postService.getAll();
+        return postService.getAll(PageRequest.of(from / size, size));
     }
 
     @GetMapping("/feed/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<PostDto> getUserFeed(@Positive @PathVariable Long userId,
+    public Page<PostDto> getUserFeed(@Positive @PathVariable Long userId,
                                      @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
                                      @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         log.info("Получен запрос на вывод персональной ленты постов для пользователя с id {}", userId);

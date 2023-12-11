@@ -1,5 +1,6 @@
 package ru.yandex.practicum.catsgram.user.service;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
 import ru.yandex.practicum.catsgram.user.dto.UpdateUserDto;
@@ -13,7 +14,7 @@ public interface UserService {
 
     UserDto patchUser(Long userId, UpdateUserDto updateUserDto);
 
-    List<UserDto> findAllByIdIn(List<Long> ids, Pageable pageable);
+    Page<UserDto> findAllByIdIn(List<Long> ids, Pageable pageable);
 
     UserDto getUserById(Long userId);
 

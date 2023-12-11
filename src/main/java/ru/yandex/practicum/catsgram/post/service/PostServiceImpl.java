@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,28 +43,46 @@ public class PostServiceImpl implements PostService {
     PostMapper postMapper;
 
     @Override
-    public List<PostDto> getAllByUserId(Long userId, Pageable pageable) {
+    public Page<PostDto> getAllByUserId(Long userId, Pageable pageable) {
         log.info("Вывод всех постов пользователя с id {} и пагинацией {}", userId, pageable);
         checkUserExist(userId);
-        return postRepository.findAllByUserId(userId, pageable)
+        List<PostDto> posts = postRepository.findAllByUserId(userId)
                 .stream()
                 .map(postMapper::toPostDto)
                 .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
+        return new PageImpl<>(posts, pageable, posts.size());
     }
 
     @Override
-    public List<PostDto> getAll() {
-        log.info("Вывод всех постов от всех пользователей");
+    public Page<PostDto> getAll(Pageable pageable) {
+        log.info("Вывод всех постов от всех пользователей c пагинацией {}", pageable);
         List<PostDto> posts = postRepository.findAll()
                 .stream()
                 .map(postMapper::toPostDto)
                 .sorted(Comparator.comparing(PostDto::getCreatedOn).reversed())
                 .collect(Collectors.toList());
         if (posts.isEmpty()) {
-            return List.of();
+            return Page.empty();
         }
-        return posts;
+        return new PageImpl<>(posts, pageable, posts.size());
+    }
+
+    @Override
+    public Page<PostDto> getUserFeed(Long userId, Pageable pageable) {
+        List<UserDto> friendsOfUser = friendshipService.findFriendsFromUserById(userId, pageable);
+        if (friendsOfUser.isEmpty()) {
+            return Page.empty();
+        }
+        List<Long> friendsIds = friendsOfUser
+                .stream()
+                .map(UserDto::getId)
+                .collect(Collectors.toList());
+        List<PostDto> postDtos = postRepository.findAllByUserIdIn(friendsIds)
+                .stream()
+                .map(postMapper::toPostDto)
+                .collect(Collectors.toList());
+        return new PageImpl<>(postDtos, pageable, postDtos.size());
     }
 
     @Override
@@ -72,13 +92,6 @@ public class PostServiceImpl implements PostService {
         Set<Like> likes = new HashSet<>();
         return postMapper.toPostDto(
                 postRepository.save(postMapper.toPost(newPostDto, author, LocalDateTime.now(), likes)));
-    }
-
-    @Override
-    @Transactional
-    public void deleteById(Long postId) {
-        log.info("Удаление поста с id {}", postId);
-        postRepository.deleteById(postId);
     }
 
     @Override
@@ -99,21 +112,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getUserFeed(Long userId, Pageable pageable) {
-        List<UserDto> friendsOfUser = friendshipService.findFriendsFromUserById(userId, pageable);
-        if (friendsOfUser.isEmpty()) {
-            return getAllByUserId(userId, pageable);
-        }
-        List<Long> friendsIds = friendsOfUser
-                .stream()
-                .map(UserDto::getId)
-                .collect(Collectors.toList());
-        return postRepository.findAllByUserIdIn(friendsIds, pageable)
-                .stream()
-                .map(postMapper::toPostDto)
-                .sorted(Comparator.comparing(PostDto::getLikes)
-                        .reversed().thenComparing(PostDto::getCreatedOn, Comparator.reverseOrder()))
-                .collect(Collectors.toList());
+    @Transactional
+    public void deleteById(Long postId) {
+        log.info("Удаление поста с id {}", postId);
+        postRepository.deleteById(postId);
     }
 
     private User checkUserExist(Long userId) {

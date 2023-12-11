@@ -3,6 +3,7 @@ package ru.yandex.practicum.catsgram.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDto> getAllByIdIn(@RequestParam(required = false) List<Long> ids,
+    public Page<UserDto> getAllByIdIn(@RequestParam(required = false) List<Long> ids,
                                       @RequestParam(defaultValue = Constants.PAGE_DEFAULT_FROM) @PositiveOrZero Integer from,
                                       @RequestParam(defaultValue = Constants.PAGE_DEFAULT_SIZE) @Positive Integer size) {
         return userService.findAllByIdIn(ids, PageRequest.of(from / size, size));
