@@ -13,6 +13,7 @@ import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
@@ -21,10 +22,10 @@ import ru.yandex.practicum.catsgram.user.service.UserServiceImpl;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,6 +141,62 @@ public class UserControllerTest {
                     .andExpect(content().json(mapper.writeValueAsString(userDto1)));
 
             verify(userService, times(1)).getUserById(ArgumentMatchers.any());
+        }
+
+        @Test
+        void shouldGetAllIfIdsEmpty() throws Exception {
+            when(userService.findAllByIdIn(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                    .thenReturn(new PageImpl<>(List.of()));
+
+            mvc.perform(get("/users??ids=&from=0&size=10")
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(mapper.writeValueAsString(new PageImpl<>(List.of()))));
+
+            verify(userService, times(1)).findAllByIdIn(ArgumentMatchers.any(), ArgumentMatchers.any());
+        }
+
+        @Test
+        void shouldGetAllByDefault() throws Exception {
+            when(userService.findAllByIdIn(ArgumentMatchers.any(), ArgumentMatchers.any()))
+                    .thenReturn(new PageImpl<>(List.of(userDto1, userDto2)));
+
+            mvc.perform(get("/users")
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(mapper.writeValueAsString(new PageImpl<>(List.of(userDto1, userDto2)))));
+
+            verify(userService, times(1)).findAllByIdIn(ArgumentMatchers.any(), ArgumentMatchers.any());
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"/users?from=-1", "/users?size=0", "/users?size=-1"})
+        void shouldReturnBadRequest(String path) throws Exception {
+            mvc.perform(get(path)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest());
+
+            verify(userService, never()).findAllByIdIn(ArgumentMatchers.any(), ArgumentMatchers.any());
+        }
+    }
+
+    @Nested
+    class DeleteById {
+        @Test
+        void shouldDelete() throws Exception {
+            mvc.perform(delete("/users/1")
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNoContent());
+
+            verify(userService, times(1)).deleteById(ArgumentMatchers.any());
         }
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.Constants;
 import ru.yandex.practicum.catsgram.post.dto.NewPostDto;
@@ -19,6 +20,7 @@ import javax.validation.constraints.PositiveOrZero;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/post")
+@Validated
 @Slf4j
 public class PostController {
     private final PostServiceImpl postService;
@@ -50,7 +52,7 @@ public class PostController {
 
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public PostDto createPost(@PathVariable Long userId,
+    public PostDto createPost(@PathVariable @Positive Long userId,
                               @Valid @RequestBody NewPostDto newPostDto) {
         log.info("Получен запрос на создание нового поста {} от пользователя с id {}", newPostDto, userId);
         return postService.createPost(newPostDto, userId);
@@ -58,8 +60,8 @@ public class PostController {
 
     @PatchMapping("/{postId}/byUser/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public PostDto pathPostByUserById(@PathVariable Long postId,
-                                      @PathVariable Long userId,
+    public PostDto pathPostByUserById(@PathVariable @Positive Long postId,
+                                      @PathVariable @Positive Long userId,
                                       @Valid @RequestBody UpdatePostDto updatePostDto) {
         log.info("Получен запрос на  обновление поста с id {} пользователем с id {}", postId, userId);
         return postService.pathPostByUserById(postId, userId, updatePostDto);
@@ -67,7 +69,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long postId) {
+    public void deleteById(@PathVariable @Positive Long postId) {
         log.info("Получен запрос на удаление поста с id {}", postId);
         postService.deleteById(postId);
     }

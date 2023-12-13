@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.Constants;
 import ru.yandex.practicum.catsgram.user.dto.NewUserDto;
@@ -21,13 +22,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Validated
 @Slf4j
 public class UserController {
 
     private final UserServiceImpl userService;
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@Positive @PathVariable Long userId) {
+    public UserDto getUser(@PathVariable @Positive Long userId) {
         log.info("Получен запрос на поиск пользователя с id {}", userId);
         return userService.getUserById(userId);
     }
@@ -50,7 +52,7 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto patchUserById(@PathVariable Long userId,
+    public UserDto patchUserById(@PathVariable @Positive Long userId,
                                  @Valid @RequestBody UpdateUserDto updateUserDto) {
         log.info("Получен запрос на обновление данных пользователя c id {}", userId);
         return userService.patchUser(userId, updateUserDto);
@@ -58,7 +60,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long userId) {
+    public void deleteById(@PathVariable @Positive Long userId) {
         log.info("Получен запрос на удаление пользователя c id {}", userId);
         userService.deleteById(userId);
     }
