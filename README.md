@@ -3,18 +3,17 @@
   <a href="https://github.com/Zazergel/catsgram">
     <img src="https://raw.githubusercontent.com/Zazergel/catsgram/main/logo.png" alt="Logo" width="400" height="200">
   </a>
-
-  <h1 align="center">Catsgram</h1>
-
   <p align="center">
     Пушистая социальная сеть для вас и ваших питомцев!
     <br/>
     <br/>
     <a href="https://github.com/Zazergel/catsgram/issues">Report Bug</a>
   </p>
-</p>
+<div class="myWrapper" markdown="1" align="center">
+  
+  ![Downloads](https://img.shields.io/github/downloads/Zazergel/catsgram/total) ![Contributors](https://img.shields.io/github/contributors/Zazergel/catsgram?color=dark-green) 
+</div>
 
-![Downloads](https://img.shields.io/github/downloads/Zazergel/catsgram/total) ![Contributors](https://img.shields.io/github/contributors/Zazergel/catsgram?color=dark-green) 
 
 ## Table Of Contents
 
@@ -35,12 +34,9 @@ Catsgram - это минималистичный аналог известной
 - **Подписка на обновления друзей:** Следите за публикациями ваших друзей в персональной ленте!
 ## Built With
 
-* [Java](http://java.com/)
-* [Maven](https://maven.apache.org/)
-* [Spring Boot](https://spring.io/projects/spring-boot)
-* [PostgreSQL](https://www.postgresql.org/)
-* [H2](https://h2database.github.io/html/main.html)
-
+<p align="left">
+    <img src="https://skillicons.dev/icons?i=java,maven,spring,postgres,hibernate" />
+</p>
 
 ## Getting Started
 
@@ -66,4 +62,4 @@ git clone https://github.com/Zazergel/catsgram.git
 
 ## Authors
 
-* **Zazergel** - *Java developer* - [Zazergel](https://github.com/Zazergel/) - **
+ **[Zazergel](https://github.com/Zazergel/)**
