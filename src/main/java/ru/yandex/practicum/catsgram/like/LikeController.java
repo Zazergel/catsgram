@@ -24,7 +24,7 @@ public class LikeController {
     @PostMapping("/add/{userId}/{postId}")
     @Transactional
     @ResponseStatus(HttpStatus.OK)
-    public void addLikeToFilmByUserId(@PathVariable @Positive Long userId,
+    public void addLikeToPostByUserId(@PathVariable @Positive Long userId,
                                       @PathVariable @Positive Long postId) {
         log.info("Пользователь с id {} отправил запрос на то, чтобы поставить мурк посту с id {}", userId, postId);
         likeService.addLikeToPostByUserId(userId, postId);
